@@ -245,7 +245,7 @@ def choose_ranked_images(portfolio_dir: Path, start_rank: int, limit: int | None
 
     ranked_images = sorted(
         path for path in ranked_dir.iterdir()
-        if path.is_file() and path.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp"}
+        if path.is_file() and path.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif"}
     )
     if start_rank < 1:
         raise ValueError("--start-rank must be >= 1")
@@ -309,6 +309,22 @@ def pad_image_with_blur_fade(image: Image.Image, pad_percent: int) -> Image.Imag
     return result
 
 
+def _load_image_any(path: Path) -> "Image.Image":
+    """Open an image file, converting HEIC/HEIF via ffmpeg if needed."""
+    if path.suffix.lower() in {".heic", ".heif"}:
+        import subprocess, tempfile
+        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
+            tmp_path = tmp.name
+        subprocess.run(
+            ["ffmpeg", "-y", "-i", str(path), tmp_path],
+            check=True, capture_output=True,
+        )
+        image = Image.open(tmp_path).copy()
+        Path(tmp_path).unlink(missing_ok=True)
+        return image
+    return Image.open(path)
+
+
 def resize_input_image(
     path: Path,
     *,
@@ -317,7 +333,8 @@ def resize_input_image(
     pad_percent: int = 0,
     pad_sides: list[str] | None = None,
 ) -> tuple[str, bytes, dict[str, Any], tuple[int, int]]:
-    with Image.open(path) as image:
+    image = _load_image_any(path)
+    with image:
         image = ImageOps.exif_transpose(image)
         image = image.convert("RGB")
         original_width, original_height = image.size
