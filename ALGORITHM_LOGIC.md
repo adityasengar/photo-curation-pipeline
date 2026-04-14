@@ -3,16 +3,16 @@
 This document describes how the project currently works end to end.
 
 It reflects the code in:
-- [main.py](/Users/aditya/Documents/trial_pics/main.py)
-- [config.py](/Users/aditya/Documents/trial_pics/config.py)
-- [image_filters.py](/Users/aditya/Documents/trial_pics/image_filters.py)
-- [pipeline.py](/Users/aditya/Documents/trial_pics/pipeline.py)
-- [ollama_review_trial.py](/Users/aditya/Documents/trial_pics/ollama_review_trial.py)
-- [gemma_rank_all_outputs.py](/Users/aditya/Documents/trial_pics/gemma_rank_all_outputs.py)
+- [main.py](main.py)
+- [config.py](config.py)
+- [image_filters.py](image_filters.py)
+- [pipeline.py](pipeline.py)
+- [ollama_review_trial.py](ollama_review_trial.py)
+- [gemma_rank_all_outputs.py](gemma_rank_all_outputs.py)
 
 ## 1. Entry Point
 
-The CLI starts in [main.py](/Users/aditya/Documents/trial_pics/main.py).
+The CLI starts in [main.py](main.py).
 
 The main relevant modes are:
 - `--folder-id`
@@ -37,7 +37,7 @@ The CLI builds a `PipelineConfig` and passes it to `CurationPipeline`.
 
 ## 2. Current Config Defaults
 
-The most important current defaults in [config.py](/Users/aditya/Documents/trial_pics/config.py) are:
+The most important current defaults in [config.py](config.py) are:
 
 - `min_megapixels = 8.0`
 - `medium_min_megapixels = 1.0`
@@ -66,7 +66,7 @@ Interpretation:
 
 ## 3. Local Folder Flow
 
-When `--local-root` is used, [pipeline.py](/Users/aditya/Documents/trial_pics/pipeline.py) runs `_run_local()`.
+When `--local-root` is used, [pipeline.py](pipeline.py) runs `_run_local()`.
 
 That flow is:
 
@@ -122,7 +122,7 @@ For every supported image file:
 
 ## 6. Decoding
 
-Decoding happens in [image_filters.py](/Users/aditya/Documents/trial_pics/image_filters.py).
+Decoding happens in [image_filters.py](image_filters.py).
 
 Current behavior:
 - JPG, JPEG, PNG, TIFF:
@@ -138,7 +138,7 @@ So orientation is normalized before later scoring and grouping.
 
 ## 7. Resolution Filtering
 
-Resolution tiering is handled by `_resolution_tier()` in [pipeline.py](/Users/aditya/Documents/trial_pics/pipeline.py).
+Resolution tiering is handled by `_resolution_tier()` in [pipeline.py](pipeline.py).
 
 Rules:
 - `>= 8 MP` -> `above_8mp`
@@ -154,7 +154,7 @@ Effect:
 
 ## 8. OpenCV Filters
 
-`apply_filters()` in [image_filters.py](/Users/aditya/Documents/trial_pics/image_filters.py) computes:
+`apply_filters()` in [image_filters.py](image_filters.py) computes:
 
 - `laplacian_var`
   Sharpness proxy
@@ -211,7 +211,7 @@ Important detail:
 
 ## 11. Quality Score
 
-`_quality_score()` in [pipeline.py](/Users/aditya/Documents/trial_pics/pipeline.py) computes:
+`_quality_score()` in [pipeline.py](pipeline.py) computes:
 
 `pass_bonus + sharpness_score + resolution_score + clip_bonus - exposure_penalty - scene_penalty`
 
@@ -238,7 +238,7 @@ Important detail:
 
 ## 12. How Grouping Works
 
-Grouping is done by `_group_similar_images()` in [pipeline.py](/Users/aditya/Documents/trial_pics/pipeline.py).
+Grouping is done by `_group_similar_images()` in [pipeline.py](pipeline.py).
 
 This is the current grouping logic.
 
@@ -465,8 +465,8 @@ Gemma is not yet integrated directly into the main pipeline.
 
 Instead, we built trial scripts:
 
-- [ollama_review_trial.py](/Users/aditya/Documents/trial_pics/ollama_review_trial.py)
-- [gemma_rank_all_outputs.py](/Users/aditya/Documents/trial_pics/gemma_rank_all_outputs.py)
+- [ollama_review_trial.py](ollama_review_trial.py)
+- [gemma_rank_all_outputs.py](gemma_rank_all_outputs.py)
 
 ### 18.1 `ollama_review_trial.py`
 

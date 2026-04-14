@@ -82,16 +82,16 @@ This step:
 
 ## Repository Layout
 
-- [main.py](/Users/aditya/Documents/trial_pics/main.py): Stage 1 CLI entry point
-- [config.py](/Users/aditya/Documents/trial_pics/config.py): Stage 1 thresholds and grouping config
-- [pipeline.py](/Users/aditya/Documents/trial_pics/pipeline.py): Stage 1 local curation logic
-- [image_filters.py](/Users/aditya/Documents/trial_pics/image_filters.py): decode, blur, exposure, and HEIC handling
-- [stage2_scene_family_pipeline.py](/Users/aditya/Documents/trial_pics/stage2_scene_family_pipeline.py): Stage 2 local VLM ranking via Ollama
-- [stage2_gemini_model_suite.py](/Users/aditya/Documents/trial_pics/stage2_gemini_model_suite.py): Gemini-based Stage 2 suite
-- [vertex_ranked_photo_improver2.py](/Users/aditya/Documents/trial_pics/vertex_ranked_photo_improver2.py): primary Vertex image-improvement pass (recommended)
-- [vertex_ranked_photo_improver.py](/Users/aditya/Documents/trial_pics/vertex_ranked_photo_improver.py): older Vertex variant
-- [gemini_ranked_photo_improver.py](/Users/aditya/Documents/trial_pics/gemini_ranked_photo_improver.py): legacy direct Gemini improver (not the primary path)
-- [ALGORITHM_LOGIC.md](/Users/aditya/Documents/trial_pics/ALGORITHM_LOGIC.md): deeper algorithm notes
+- [main.py](main.py): Stage 1 CLI entry point
+- [config.py](config.py): Stage 1 thresholds and grouping config
+- [pipeline.py](pipeline.py): Stage 1 local curation logic
+- [image_filters.py](image_filters.py): decode, blur, exposure, and HEIC handling
+- [stage2_scene_family_pipeline.py](stage2_scene_family_pipeline.py): Stage 2 local VLM ranking via Ollama
+- [stage2_gemini_model_suite.py](stage2_gemini_model_suite.py): Gemini-based Stage 2 suite
+- [vertex_ranked_photo_improver2.py](vertex_ranked_photo_improver2.py): primary Vertex image-improvement pass (recommended)
+- [vertex_ranked_photo_improver.py](vertex_ranked_photo_improver.py): older Vertex variant
+- [gemini_ranked_photo_improver.py](gemini_ranked_photo_improver.py): legacy direct Gemini improver (not the primary path)
+- [ALGORITHM_LOGIC.md](ALGORITHM_LOGIC.md): deeper algorithm notes
 
 ## Requirements
 
@@ -146,7 +146,7 @@ Example with a custom output name:
 
 ```bash
 python3 main.py \
-  --local-root "/Users/aditya/Library/CloudStorage/GoogleDrive-adityasengariitd@gmail.com/My Drive/Pictures/Italy June 2025" \
+  --local-root "/path/to/your/album" \
   --local-output-name Curated_Best_Stage2Ready
 ```
 
@@ -176,13 +176,13 @@ The CSV includes:
 
 If you want the same output naming every time and do not want to keep editing folder names manually, use:
 
-[run_album_pipeline.py](/Users/aditya/Documents/trial_pics/run_album_pipeline.py)
+[run_album_pipeline.py](run_album_pipeline.py)
 
 Typical usage:
 
 ```bash
 cd "/path/to/one/album/folder"
-python3 /Users/aditya/Documents/trial_pics/run_album_pipeline.py
+python3 run_album_pipeline.py
 ```
 
 What it does by default:
@@ -209,7 +209,7 @@ Example reusing existing Stage 1:
 
 ```bash
 cd "/path/to/one/album/folder"
-python3 /Users/aditya/Documents/trial_pics/run_album_pipeline.py --reuse-stage1
+python3 run_album_pipeline.py --reuse-stage1
 ```
 
 ### Common Run Modes
@@ -218,42 +218,42 @@ Fresh full run (default model `gemma4:31b`):
 
 ```bash
 cd "/path/to/one/album/folder"
-python3 /Users/aditya/Documents/trial_pics/run_album_pipeline.py
+python3 run_album_pipeline.py
 ```
 
 Fresh full run with a different model:
 
 ```bash
 cd "/path/to/one/album/folder"
-python3 /Users/aditya/Documents/trial_pics/run_album_pipeline.py --model gemma3:27b
+python3 run_album_pipeline.py --model gemma3:27b
 ```
 
 Resume from existing Stage 1 output:
 
 ```bash
 cd "/path/to/one/album/folder"
-python3 /Users/aditya/Documents/trial_pics/run_album_pipeline.py --reuse-stage1
+python3 run_album_pipeline.py --reuse-stage1
 ```
 
 Resume and continue from existing family reduction (automatic with `--reuse-stage1`):
 
 ```bash
 cd "/path/to/one/album/folder"
-python3 /Users/aditya/Documents/trial_pics/run_album_pipeline.py --reuse-stage1
+python3 run_album_pipeline.py --reuse-stage1
 ```
 
 Force family-reduction recalculation (even if an old `Stage2_FamilyReduced_*` exists):
 
 ```bash
 cd "/path/to/one/album/folder"
-python3 /Users/aditya/Documents/trial_pics/run_album_pipeline.py --reuse-stage1 --force-family-rerun
+python3 run_album_pipeline.py --reuse-stage1 --force-family-rerun
 ```
 
 Run only Stage 1 (skip Stage 2):
 
 ```bash
 cd "/path/to/one/album/folder"
-python3 /Users/aditya/Documents/trial_pics/run_album_pipeline.py --skip-stage2
+python3 run_album_pipeline.py --skip-stage2
 ```
 
 ## Stage 2 Usage: Local Ollama Models
@@ -265,7 +265,7 @@ Stage 2 can start from a full Stage 1 folder or resume from an existing family-r
 Example with `gemma3:27b`:
 
 ```bash
-python3 /Users/aditya/Documents/trial_pics/stage2_scene_family_pipeline.py \
+python3 stage2_scene_family_pipeline.py \
   --stage1-dir "/path/to/Curated_Best_Stage2Ready" \
   --model gemma3:27b
 ```
@@ -273,7 +273,7 @@ python3 /Users/aditya/Documents/trial_pics/stage2_scene_family_pipeline.py \
 Example with `gemma4:31b`:
 
 ```bash
-python3 /Users/aditya/Documents/trial_pics/stage2_scene_family_pipeline.py \
+python3 stage2_scene_family_pipeline.py \
   --stage1-dir "/path/to/Curated_Best_Stage2Ready" \
   --model gemma4:31b
 ```
@@ -283,7 +283,7 @@ python3 /Users/aditya/Documents/trial_pics/stage2_scene_family_pipeline.py \
 If family reduction already exists:
 
 ```bash
-python3 /Users/aditya/Documents/trial_pics/stage2_scene_family_pipeline.py \
+python3 stage2_scene_family_pipeline.py \
   --resume-family-dir "/path/to/Stage2_FamilyReduced_gemma3_27b" \
   --model gemma3:27b
 ```
@@ -344,7 +344,7 @@ Stage2_PortfolioTop_<model_slug>/
 If you want to run Stage 2 using Gemini instead of Ollama:
 
 ```bash
-python3 /Users/aditya/Documents/trial_pics/stage2_gemini_model_suite.py \
+python3 stage2_gemini_model_suite.py \
   --stage1-dir "/path/to/Curated_Best_Stage2Ready" \
   --model gemini-2.5-pro \
   --suite-output-dir "/path/to/Gemini_Stage2"
@@ -372,13 +372,13 @@ Useful Gemini suite flags:
 If you already ran:
 
 ```bash
-python3 /Users/aditya/Documents/trial_pics/run_album_pipeline.py --reuse-stage1
+python3 run_album_pipeline.py --reuse-stage1
 ```
 
 and you are still in that album folder, run:
 
 ```bash
-python3 /Users/aditya/Documents/trial_pics/vertex_ranked_photo_improver2.py --overwrite
+python3 vertex_ranked_photo_improver2.py --overwrite
 ```
 
 This uses default settings (`gemini-3-pro-image-preview`, `4K`, unified prompt path) and writes:
@@ -395,7 +395,7 @@ Stage2_PortfolioTop_<model_slug>.../
 If you want to target one specific portfolio folder explicitly:
 
 ```bash
-python3 /Users/aditya/Documents/trial_pics/vertex_ranked_photo_improver2.py \
+python3 vertex_ranked_photo_improver2.py \
   --portfolio-dir "/absolute/path/to/Stage2_PortfolioTop_..._printplans" \
   --overwrite
 ```
@@ -403,7 +403,7 @@ python3 /Users/aditya/Documents/trial_pics/vertex_ranked_photo_improver2.py \
 ### Quick smoke test before full run
 
 ```bash
-python3 /Users/aditya/Documents/trial_pics/vertex_ranked_photo_improver2.py \
+python3 vertex_ranked_photo_improver2.py \
   --portfolio-dir "/absolute/path/to/Stage2_PortfolioTop_..._printplans" \
   --limit 5 \
   --overwrite
@@ -427,7 +427,7 @@ python3 /Users/aditya/Documents/trial_pics/vertex_ranked_photo_improver2.py \
 
 If you ever need the older direct Gemini path, the script is:
 
-[gemini_ranked_photo_improver.py](/Users/aditya/Documents/trial_pics/gemini_ranked_photo_improver.py)
+[gemini_ranked_photo_improver.py](gemini_ranked_photo_improver.py)
 
 This is no longer the primary enhancement route in this project.
 
@@ -478,4 +478,4 @@ That means:
 
 For a lower-level explanation of grouping, thresholds, and CSV fields, see:
 
-[ALGORITHM_LOGIC.md](/Users/aditya/Documents/trial_pics/ALGORITHM_LOGIC.md)
+[ALGORITHM_LOGIC.md](ALGORITHM_LOGIC.md)
