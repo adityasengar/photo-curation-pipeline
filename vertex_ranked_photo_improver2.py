@@ -538,11 +538,24 @@ def build_improvement_prompt(
     risk_flags: list[str] = []
     enhancement_goal = ""
 
+    # Keywords that indicate a rotation instruction from the prior ranking model.
+    # Rotation must be done in Python (already handled via exif_transpose), never
+    # delegated to the generative model — it causes hallucination of subjects.
+    _rotation_keywords = {"rotat", "turn 90", "flip", "orient"}
+
+    def _is_rotation_instruction(text: str) -> bool:
+        lower = text.lower()
+        return any(kw in lower for kw in _rotation_keywords)
+
     if detail:
         enhancement_goal = str(detail.get("enhancement_goal", "")).strip()
-        safe_edits = [str(item).strip() for item in detail.get("safe_edits", []) if str(item).strip()]
+        safe_edits = [
+            str(item).strip() for item in detail.get("safe_edits", [])
+            if str(item).strip() and not _is_rotation_instruction(str(item))
+        ]
         conditional_edits = [
-            str(item).strip() for item in detail.get("conditional_edits", []) if str(item).strip()
+            str(item).strip() for item in detail.get("conditional_edits", [])
+            if str(item).strip() and not _is_rotation_instruction(str(item))
         ]
         avoid_edits = [str(item).strip() for item in detail.get("avoid_edits", []) if str(item).strip()]
         risk_flags = [str(item).strip() for item in detail.get("risk_flags", []) if str(item).strip()]
@@ -650,12 +663,16 @@ Trust the image more than any metadata. If the metadata conflicts with the visib
 Fix the chosen primary repair mode first. Do not hide from the main issue by doing only exposure, contrast, or color cleanup.
 Use the smallest set of changes that clearly improves print quality while keeping the image believable and faithful to the source.
 
-## Tonal polish
-Goal: {goal}
-Safe edits: {safe}
-Conditional (only if clearly needed): {conditional}
-Avoid: {avoid}
-Risks: {risks}
+## Tonal guidance (suggestions from a prior model pass — trust what you see over these)
+A previous ranking model reviewed this image and offered the following hints.
+Apply only what is clearly supported by what you actually see in the image.
+Ignore any suggestion that conflicts with the hard rules above or that would require
+changing subjects, geometry, or content.
+Suggested goal: {goal}
+Consider if clearly visible in the image: {safe}
+Consider only if it clearly helps and stays faithful: {conditional}
+Do not do: {avoid}
+Risks to respect: {risks}
 
 ## Output
 {output_note}"""
