@@ -1,0 +1,32 @@
+# Credentials & secrets
+credentials.json
+*.json.secret
+application_default_credentials.json
+service_account*.json
+gcloud/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# Pipeline outputs (large, generated)
+Curated_Best_Stage2Ready/
+Stage2_FamilyReduced*/
+Stage2_PortfolioTop*/
+ranked_improved*/
+*_improved/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/

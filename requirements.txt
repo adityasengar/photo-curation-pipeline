@@ -1,0 +1,11 @@
+google-api-python-client==2.131.0
+google-auth-httplib2==0.2.0
+google-auth-oauthlib==1.2.0
+opencv-python-headless==4.10.0.84
+open-clip-torch==2.26.1
+torch>=2.1.0
+Pillow>=10.0.0
+numpy>=1.24.0
+transformers>=4.46.0
+accelerate>=1.0.0
+sentencepiece>=0.2.0
