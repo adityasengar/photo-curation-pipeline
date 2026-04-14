@@ -80,6 +80,22 @@ def parse_args() -> argparse.Namespace:
         help="Folder name created inside each local photo folder (default: Curated_Best).",
     )
     p.add_argument(
+        "--hard-blur-threshold", type=float, default=25.0,
+        help="Laplacian variance below which an image is hard-rejected as blurry (default: 25.0).",
+    )
+    p.add_argument(
+        "--singleton-blur-threshold", type=float, default=50.0,
+        help="Stricter blur threshold applied to singleton images with no group peers (default: 50.0).",
+    )
+    p.add_argument(
+        "--singleton-min-quality", type=float, default=2.75,
+        help="Minimum quality score for singleton images to survive (default: 2.75).",
+    )
+    p.add_argument(
+        "--singleton-group-penalty", type=float, default=0.6,
+        help="Quality score penalty multiplier applied to singleton images (default: 0.6).",
+    )
+    p.add_argument(
         "--similarity-threshold", type=float, default=0.97,
         help="Cosine similarity threshold for grouping similar images in local mode (default: 0.97).",
     )
@@ -109,6 +125,7 @@ def main() -> None:
         credentials_path=Path(args.credentials),
         min_megapixels=args.min_mp,
         medium_min_megapixels=args.medium_min_mp,
+        hard_blur_threshold=args.hard_blur_threshold,
         laplacian_threshold=args.laplacian_threshold,
         black_clip_pct=args.black_clip,
         white_clip_pct=args.white_clip,
@@ -119,6 +136,9 @@ def main() -> None:
         csv_path=Path(args.output_dir) / "curation_log.csv",
         local_output_dirname=args.local_output_name,
         similarity_threshold=args.similarity_threshold,
+        singleton_hard_blur_threshold=args.singleton_blur_threshold,
+        singleton_min_quality_score=args.singleton_min_quality,
+        singleton_group_penalty=args.singleton_group_penalty,
         enable_background_people_check=args.check_background_people,
     )
 
