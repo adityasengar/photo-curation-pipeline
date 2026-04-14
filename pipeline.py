@@ -295,8 +295,31 @@ class CurationPipeline:
                     decision.quality_score = round(best.quality_score, 4)
                     decision.singleton_penalty_applied = round(self._cfg.singleton_group_penalty, 4)
 
-                selected.append(best)
+                selected.append((best, group, group_id))
 
+            # ── keep_ratio trim ───────────────────────────────────────────
+            # Sort all winners by quality score descending and keep only the
+            # top fraction. Images trimmed here are marked rejected so the
+            # CSV reflects the decision.
+            if self._cfg.keep_ratio < 1.0 and selected:
+                keep_n = max(1, math.ceil(len(selected) * self._cfg.keep_ratio))
+                selected_sorted = sorted(selected, key=lambda t: t[0].quality_score, reverse=True)
+                kept = set(id(t[0]) for t in selected_sorted[:keep_n])
+                cutoff_score = selected_sorted[keep_n - 1][0].quality_score
+                trimmed = [t for t in selected if id(t[0]) not in kept]
+                for c, _, _gid in trimmed:
+                    d = decisions[str(c.path)]
+                    d.status = "rejected"
+                    d.rejection_reason = (
+                        f"keep_ratio_trim (score={c.quality_score:.3f}, cutoff={cutoff_score:.3f})"
+                    )
+                selected = [t for t in selected if id(t[0]) in kept]
+                log.info(
+                    "  keep_ratio=%.2f: kept %d of %d winners (cutoff score=%.3f)",
+                    self._cfg.keep_ratio, len(selected), len(selected) + len(trimmed), cutoff_score,
+                )
+
+            for best, group, group_id in selected:
                 winner_dir = self._tier_output_dir(best.resolution_tier, highres_dir, mediumres_dir)
                 destination = self._copy_local_winner(best.path, winner_dir)
                 raw_copy_path = self._copy_matching_raw(best.path, winner_dir)

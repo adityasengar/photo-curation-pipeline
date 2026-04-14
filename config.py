@@ -54,6 +54,7 @@ class PipelineConfig:
     singleton_hard_blur_threshold: float = 50.0
     singleton_min_quality_score: float = 2.75
     singleton_group_penalty: float = 0.6
+    keep_ratio: float = 1.0          # trim winners to this fraction of total, sorted by quality score (1.0 = keep all)
     enable_background_people_check: bool = False
     background_people_hard_reject: bool = False
     max_background_faces: int = 0

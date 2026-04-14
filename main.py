@@ -96,6 +96,10 @@ def parse_args() -> argparse.Namespace:
         help="Quality score penalty multiplier applied to singleton images (default: 0.6).",
     )
     p.add_argument(
+        "--keep-ratio", type=float, default=1.0,
+        help="After selection, trim winners to this fraction of total sorted by quality score, e.g. 0.5 keeps the top half (default: 1.0 = keep all).",
+    )
+    p.add_argument(
         "--similarity-threshold", type=float, default=0.97,
         help="Cosine similarity threshold for grouping similar images in local mode (default: 0.97).",
     )
@@ -139,6 +143,7 @@ def main() -> None:
         singleton_hard_blur_threshold=args.singleton_blur_threshold,
         singleton_min_quality_score=args.singleton_min_quality,
         singleton_group_penalty=args.singleton_group_penalty,
+        keep_ratio=args.keep_ratio,
         enable_background_people_check=args.check_background_people,
     )
 
