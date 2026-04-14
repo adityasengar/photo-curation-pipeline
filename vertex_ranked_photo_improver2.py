@@ -310,18 +310,10 @@ def pad_image_with_blur_fade(image: Image.Image, pad_percent: int) -> Image.Imag
 
 
 def _load_image_any(path: Path) -> "Image.Image":
-    """Open an image file, converting HEIC/HEIF via ffmpeg if needed."""
+    """Open an image file, with HEIC/HEIF support via pillow-heif."""
     if path.suffix.lower() in {".heic", ".heif"}:
-        import subprocess, tempfile
-        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
-            tmp_path = tmp.name
-        subprocess.run(
-            ["ffmpeg", "-y", "-i", str(path), tmp_path],
-            check=True, capture_output=True,
-        )
-        image = Image.open(tmp_path).copy()
-        Path(tmp_path).unlink(missing_ok=True)
-        return image
+        import pillow_heif
+        pillow_heif.register_heif_opener()
     return Image.open(path)
 
 
