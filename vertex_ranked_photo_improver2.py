@@ -37,7 +37,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--portfolio-dir",
         help=(
-            "Path to a portfolio folder containing ranked/ and portfolio_summary.json. "
+            "Path to a portfolio folder containing a ranked/ subfolder. "
             "If omitted, the script auto-discovers a suitable Stage2 portfolio folder."
         ),
     )
@@ -114,7 +114,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def _looks_like_portfolio_dir(path: Path) -> bool:
-    return path.is_dir() and (path / "ranked").is_dir() and (path / "portfolio_summary.json").is_file()
+    return path.is_dir() and (path / "ranked").is_dir()
 
 
 def resolve_portfolio_dir(portfolio_dir_arg: str | None) -> Path:
@@ -122,7 +122,7 @@ def resolve_portfolio_dir(portfolio_dir_arg: str | None) -> Path:
         path = Path(portfolio_dir_arg).expanduser().resolve()
         if not _looks_like_portfolio_dir(path):
             raise FileNotFoundError(
-                f"Invalid portfolio folder: {path}. Expected ranked/ and portfolio_summary.json."
+                f"Invalid portfolio folder: {path}. Expected a ranked/ subfolder."
             )
         return path
 
@@ -234,7 +234,7 @@ def auth_header(credentials: Any) -> dict[str, str]:
 def load_portfolio_summary(portfolio_dir: Path) -> dict[str, Any]:
     summary_path = portfolio_dir / "portfolio_summary.json"
     if not summary_path.exists():
-        raise FileNotFoundError(f"Missing portfolio summary: {summary_path}")
+        return {}
     return json.loads(summary_path.read_text())
 
 
