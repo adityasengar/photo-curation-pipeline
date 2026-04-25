@@ -366,17 +366,24 @@ def resize_input_image(
 
 
 def aspect_ratio_string(size: tuple[int, int]) -> str:
+    """Return the nearest Vertex-supported aspect ratio string for the given size."""
     width, height = size
     if width <= 0 or height <= 0:
         return "1:1"
 
-    def gcd(a: int, b: int) -> int:
-        while b:
-            a, b = b, a % b
-        return a
-
-    divisor = gcd(width, height)
-    return f"{width // divisor}:{height // divisor}"
+    # Vertex only accepts these aspect ratios for image output.
+    supported = [
+        (1, 1),
+        (4, 3),
+        (3, 4),
+        (16, 9),
+        (9, 16),
+        (3, 2),
+        (2, 3),
+    ]
+    actual = width / height
+    best = min(supported, key=lambda r: abs(actual - r[0] / r[1]))
+    return f"{best[0]}:{best[1]}"
 
 
 ANALYSIS_PROMPT = """\
@@ -793,6 +800,7 @@ def improve_one_image(
     pad_percent: int,
     timeout: int,
     overwrite: bool,
+    manual_prompt: str | None = None,
 ) -> dict[str, Any]:
     ranked_filename = image_path.name
 
@@ -825,7 +833,16 @@ def improve_one_image(
     )
     input_info["analysis"] = analysis
 
-    prompt = build_improvement_prompt(ranked_filename, detail, analysis=analysis)
+    auto_prompt = build_improvement_prompt(ranked_filename, detail, analysis=analysis)
+    if manual_prompt:
+        prompt = (
+            f"{manual_prompt.strip()}\n\n"
+            "---\n"
+            "## Secondary guidance (lower priority — apply only where consistent with the instruction above)\n"
+            f"{auto_prompt}"
+        )
+    else:
+        prompt = auto_prompt
     ratio = aspect_ratio_string(original_size)
 
     existing_outputs = sorted(output_dir.glob(f"{image_path.stem}.*"))
