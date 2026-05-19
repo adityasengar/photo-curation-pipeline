@@ -89,8 +89,8 @@ This step:
 - [stage2_scene_family_pipeline.py](stage2_scene_family_pipeline.py): Stage 2 local VLM ranking via Ollama
 - [stage2_gemini_model_suite.py](stage2_gemini_model_suite.py): Gemini-based Stage 2 suite
 - [vertex_ranked_photo_improver2.py](vertex_ranked_photo_improver2.py): primary Vertex image-improvement pass (recommended)
-- [vertex_ranked_photo_improver.py](vertex_ranked_photo_improver.py): older Vertex variant
-- [gemini_ranked_photo_improver.py](gemini_ranked_photo_improver.py): legacy direct Gemini improver (not the primary path)
+- [vertex_quick_fix.py](vertex_quick_fix.py): standalone single-image Vertex enhancement (supports gemma analysis, selective edit, ultra-preserve modes)
+- [run.sh](run.sh): wrapper script that handles SSL/venv boilerplate for all commands
 - [ALGORITHM_LOGIC.md](ALGORITHM_LOGIC.md): deeper algorithm notes
 
 ## Requirements
@@ -117,7 +117,13 @@ For local Stage 2 with Ollama, you also need:
   - `ollama pull gemma3:27b`
   - `ollama pull gemma4:31b`
 
-For Gemini-based ranking or Vertex improvement, set:
+For Vertex improvement, authenticate with Google Cloud:
+
+```bash
+gcloud auth application-default login
+```
+
+For Gemini-based ranking via API, set:
 
 ```bash
 export GEMINI_API_KEY=your_api_key_here
@@ -423,13 +429,46 @@ python3 vertex_ranked_photo_improver2.py \
 - `--limit`
 - `--overwrite`
 
-### Legacy direct Gemini improver (optional)
+## Quick Fix (Individual Images)
 
-If you ever need the older direct Gemini path, the script is:
+If you want to enhance specific photos without running the full pipeline, use `vertex_quick_fix.py`. Output is saved in a `_vertex_fixed/` folder next to the source images.
 
-[gemini_ranked_photo_improver.py](gemini_ranked_photo_improver.py)
+```bash
+# Default auto-prompt
+./run.sh fix photo.JPG
 
-This is no longer the primary enhancement route in this project.
+# Gemma analyzes the image and writes the enhancement prompt
+./run.sh fix photo.JPG --gemma
+
+# Gemma + your custom prompt (yours takes priority)
+./run.sh fix photo.JPG --gemma --prompt "improve sky colors and reduce haze"
+
+# Selective edit (inpainting mode — only modifies background, subject untouched)
+./run.sh fix photo.JPG --gemma --prompt "remove crowd" --selective-edit
+
+# Ultra-preserve (museum-quality pixel preservation of subject)
+./run.sh fix photo.JPG --gemma --prompt "enhance lighting" --ultra-preserve
+
+# Process multiple images at once
+./run.sh fix photo1.JPG photo2.JPG photo3.JPG --gemma
+
+# Reprocess existing output
+./run.sh fix photo.JPG --overwrite
+```
+
+## Wrapper Script
+
+All commands can be run through `./run.sh`, which handles SSL certificates and virtual environment paths automatically:
+
+```bash
+./run.sh check                  # verify environment health
+./run.sh stage1 <album-dir>    # Stage 1
+./run.sh stage2 <stage1-dir>   # Stage 2
+./run.sh stage3 <portfolio-dir> # Stage 3
+./run.sh fix <images> [flags]  # quick-fix
+```
+
+Run `./run.sh` with no arguments for full usage information.
 
 ## Current Selection Philosophy
 
